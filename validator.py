@@ -39,5 +39,5 @@ print(input_string)
 scanner = Scanner(input_string)
 # print scanner.tokens
 
-parser = Parser(scanner)
-parser.start()
+# parser = Parser(scanner)
+# parser.start()

@@ -33,17 +33,17 @@ class Scanner:
         match = get_token(input_string)
         while match is not None:
             match_type = match.lastgroup
-            if match_type == Token.NEWLINE:
+            if match_type == t.NEWLINE:
                 line_start = position
                 line_number += 1
-            elif match_type != Token.SKIP:
+            elif match_type != t.SKIP:
                 value = match.group(match_type)
-                if match_type == Token.ID and value in keywords:
+                if match_type == t.ID and value in keywords:
                     match_type = value
-                elif match_type == Token.ID and value == '-':
-                    match_type = Token.LI
-                elif match_type == Token.ID and value == ':':
-                    match_type = Token.ASSIGN
+                elif match_type == t.ID and value == '-':
+                    match_type = t.ITEM
+                elif match_type == t.ID and value == ':':
+                    match_type = t.ASSIGN
                 yield Token(match_type, value, line_number, match.start() - line_start)
             current_position = match.end()
             match = get_token(input_string, current_position)
