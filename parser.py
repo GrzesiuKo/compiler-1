@@ -30,6 +30,7 @@ class Parser:
         if self.token.type in Token.START_TOKENS:
             self.program()
             self.take_token('EOF')
+            print("ENVIRONMENT OK")
         else:
             self.error("Epsilon not allowed")
 
@@ -39,6 +40,7 @@ class Parser:
         if self.token.type in Token.STATEMENTS:
             self.statement()
             self.program()
+            print("PROGRAM OK")
         # program -> eps
         else:
             print("ETF: "+self.token.value)
@@ -46,6 +48,7 @@ class Parser:
 
     def statement(self):
         print("statement")
+        x = self.token.value
         if self.token.type == Token.VERSION:
             self.version_stmt()
         elif self.token.type == Token.SERVICES:
@@ -57,13 +60,15 @@ class Parser:
         else:
             self.error("Epsilon not allowed")
 
+        print("STATEMENT "+x+" OK")
+
     def version_stmt(self):
         print("version_stmt")
         if self.token.type == Token.VERSION:
             self.take_token(Token.VERSION)
             self.take_token(Token.ASSIGN)
             self.take_token(Token.STRING)
-            print("version_stmt OK")
+            print("VERSION OK")
         else:
             self.error("Epsilon not allowed")
 
@@ -73,18 +78,19 @@ class Parser:
             self.take_token(Token.SERVICES)
             self.take_token(Token.ASSIGN)
             self.service()
-            print("services_stmt OK")
+            print("SERVICES OK")
         else:
             self.error("Epsilon not allowed")
 
     def service(self):
         print("service token: "+self.token.type+" "+self.token.value)
+        x = self.token.value
         if self.token.type == Token.ID:
             self.take_token(Token.ID)
             self.take_token(Token.ASSIGN)
             self.element()
 
-            print("service OK")
+            print("SERVICE "+x+" OK")
         else:
             pass
 
@@ -101,11 +107,11 @@ class Parser:
         if self.token.type in elements:
             elements[self.token.type]()
             self.element()
-        elif self.token.column == indent:
-            self.service()
-
         else:
-            self.error("Epsilon not allowed")
+            self.service()
+        #
+        # else:
+        #     self.error("Epsilon not allowed")
 
     def ports_stmt(self):
         print("ports token: " + self.token.type + " " + self.token.value)
@@ -113,6 +119,7 @@ class Parser:
             self.take_token(Token.PORTS)
             self.take_token(Token.ASSIGN)
             self.list()
+            print("PORTS OK")
         else:
             self.error("Epsilon not allowed")
 
@@ -120,16 +127,31 @@ class Parser:
         print("list token: " + self.token.type + " " + self.token.value)
         if self.token.type == Token.ITEM:
             self.take_token(Token.ITEM)
-            self.take_token(Token.ID)
+            self.value()
             self.list()
         else:
             pass
+
+    def value(self):
+        print("value token: "+self.token.type+" "+self.token.value)
+
+        if self.token.type == Token.NUMBER:
+            self.take_token(Token.NUMBER)
+        elif self.token.type == Token.STRING:
+            self.take_token(Token.STRING)
+        elif self.token.type == Token.ID:
+            self.take_token(Token.ID)
+        else:
+            self.error("Epsilon not allowed")
+
+        print("val line: " + str(self.token.line) + " column: " + str(self.token.column))
 
     def build_stmt(self):
         if self.token.type == Token.BUILD:
             self.take_token(Token.BUILD)
             self.take_token(Token.ASSIGN)
             self.take_token(Token.STRING)
+            print("BUILD OK")
         else:
             pass
 
@@ -140,6 +162,7 @@ class Parser:
             self.take_token(Token.ASSIGN)
             self.take_token(Token.ID)
             print("end image  token: "+self.token.type+" "+self.token.value)
+            print("IMAGE OK")
         else:
             pass
 
@@ -148,15 +171,28 @@ class Parser:
             self.take_token(Token.ENVIRONMENT)
             self.take_token(Token.ASSIGN)
             self.dict()
+            print("ENVIRONMENT OK")
         else:
             pass
 
     def dict(self):
-        if self.token.type == Token.STRING:
-            self.take_token(Token.STRING)
+        print("dict token: "+self.token.type+" "+self.token.value)
+
+        start, service_name, indent = self.token.line, self.token.value, self.token.column
+        if self.token.type == Token.ID:
+            self.take_token(Token.ID)
             self.take_token(Token.ASSIGN)
-            self.take_token(Token.STRING)
+            print("start: "+str(start)+" indent: "+str(indent))
+            print("line: "+str(self.token.line)+" column: "+str(self.token.column))
+            if self.token.line == start:
+                self.value()
+
+            print("after val --> token: "+self.token.type+" "+self.token.value)
+            print("after start: "+str(start)+" indent: "+str(indent))
+            print("after line: "+str(self.token.line)+" column: "+str(self.token.column))
             self.dict()
+            if self.token.column == indent:
+                self.dict()
         else:
             pass
 
@@ -165,6 +201,7 @@ class Parser:
             self.take_token(Token.DEPLOY)
             self.take_token(Token.ASSIGN)
             self.dict()
+            print("DEPLOY OK")
         else:
             pass
 
@@ -173,6 +210,7 @@ class Parser:
             self.take_token(Token.NETWORKS)
             self.take_token(Token.ASSIGN)
             self.list()
+            print("NETWORKS OK")
         else:
             pass
 
@@ -181,28 +219,24 @@ class Parser:
             self.take_token(Token.VOLUMES)
             self.take_token(Token.ASSIGN)
             self.list()
+            print("VOLUMES OK")
         else:
             pass
 
     def networks_stmt(self):
-        # value -> NUMBER
-        if self.token.type == 'NUMBER':
-            self.take_token('NUMBER')
-        # value -> ID
-        elif self.token.type == 'ID':
-            self.take_token('ID')
+        if self.token.type == Token.NETWORKS:
+            self.take_token(Token.NETWORKS)
+            self.take_token(Token.ASSIGN)
+            self.dict()
+            print("NETWORKS_stmt OK")
         else:
             self.error("Epsilon not allowed")
 
     def volumes_stmt(self):
-        # if_stmt -> IF ID THEN program ENDIF END
-        if self.token.type == 'IF':
-            self.take_token('IF')
-            self.take_token('ID')
-            self.take_token('THEN')
-            self.program()
-            self.take_token('ENDIF')
-            self.take_token('END')
-            print("if_stmt OK")
+        if self.token.type == Token.VOLUMES:
+            self.take_token(Token.VOLUMES)
+            self.take_token(Token.ASSIGN)
+            self.dict()
+            print("VOLUMES_stmt OK")
         else:
             self.error("Epsilon not allowed")
