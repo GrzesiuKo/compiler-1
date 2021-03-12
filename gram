@@ -1,0 +1,21 @@
+<start> ::= <program> <eof>
+<program> ::= <statement> <program> | <eps>
+<statement> ::= <version_stmt> | <services_stmt> | <networks_stmt> | <volumes_stmt>
+<services_stmt> ::= <services><assign><service>
+<service> ::= <string><assign><element> | <eof>
+<element> ::= <ports_stmt> | <build_stmt> | <image_stmt> | <environment_stmt> | <deploy_stmt> | <network> | <volumes> <element> | <service>
+<version_stmt> ::= <version> <assign> <string>
+<networks_stmt> ::= <networks> <list>
+<volumes_stmt> ::= <volumes> <list>
+<list>::= <item><string><list> | <eof>
+
+<ports_stmt> ::= <ports> <assign> <list>
+<build_stmt> ::= <build> <assign> <string>
+<image_stmt> ::= <image> <assign> <id>
+<environment_stmt> ::= <environment><assign><dict>
+
+<dict>:== <string><assign><string><dict> | <eof>
+
+<deploy_stmt> ::= <deploy><assign><dict>
+<network> ::= <networks> <assign> <list>
+<volumes> ::= <volumes> <assign> <list>

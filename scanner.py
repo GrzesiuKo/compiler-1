@@ -14,8 +14,8 @@ class Scanner:
             self.tokens.append(token)
 
     def tokenize(self, input_string):
-        keywords = {'version', '﻿services', '﻿build', 'ports', '﻿image', '﻿volumes', '﻿enviroment', '﻿networks',
-                    '﻿deploy'}
+        keywords = {t.VERSION, t.SERVICES, t.BUILD, t.PORTS, t.IMAGE, t.VOLUMES, t.ENVIRONMENT, t.NETWORKS,
+                    t.DEPLOY}
         token_specification = [
             (t.STRING, r'\"(.*?)\"'),
             (t.NUMBER, r'\d+(\.\d*)?'),
@@ -40,9 +40,9 @@ class Scanner:
                 value = match.group(match_type)
                 if match_type == t.ID and value in keywords:
                     match_type = value
-                elif match_type == t.ID and value == '-':
+                elif match_type == t.ID and value == "-":
                     match_type = t.ITEM
-                elif match_type == t.ID and value == ':':
+                elif match_type == t.ID and value == ":":
                     match_type = t.ASSIGN
                 yield Token(match_type, value, line_number, match.start() - line_start)
             current_position = match.end()

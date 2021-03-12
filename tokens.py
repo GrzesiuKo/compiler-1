@@ -20,3 +20,5 @@ class Token:
     ITEM = "item"
     NEWLINE = "newline"
     SKIP = "SKIP"
+
+    ELEMENTS = [PORTS, BUILD, IMAGE, ENVIRONMENT, DEPLOY, NETWORKS, VOLUMES]
