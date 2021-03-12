@@ -25,7 +25,6 @@ class Parser:
 
     # Starting symbol
     def start(self):
-        print("start")
         # start -> program EOF
         if self.token.type in Token.START_TOKENS:
             self.program()
@@ -35,7 +34,6 @@ class Parser:
             self.error("Epsilon not allowed")
 
     def program(self):
-        print("program value: '"+self.token.value+"'")
         # program -> statement program
         if self.token.type in Token.STATEMENTS:
             self.statement()
@@ -43,11 +41,9 @@ class Parser:
             print("PROGRAM OK")
         # program -> eps
         else:
-            print("ETF: "+self.token.value)
             pass
 
     def statement(self):
-        print("statement")
         x = self.token.value
         if self.token.type == Token.VERSION:
             self.version_stmt()
@@ -63,7 +59,6 @@ class Parser:
         print("STATEMENT "+x+" OK")
 
     def version_stmt(self):
-        print("version_stmt")
         if self.token.type == Token.VERSION:
             self.take_token(Token.VERSION)
             self.take_token(Token.ASSIGN)
@@ -73,7 +68,6 @@ class Parser:
             self.error("Epsilon not allowed")
 
     def services_stmt(self):
-        print("services_stmt")
         if self.token.type == Token.SERVICES:
             self.take_token(Token.SERVICES)
             self.take_token(Token.ASSIGN)
@@ -83,7 +77,6 @@ class Parser:
             self.error("Epsilon not allowed")
 
     def service(self):
-        print("service token: "+self.token.type+" "+self.token.value)
         x = self.token.value
         if self.token.type == Token.ID:
             self.take_token(Token.ID)
@@ -95,7 +88,6 @@ class Parser:
             pass
 
     def element(self):
-        print("element token: "+self.token.type+" "+self.token.value)
         start, service_name, indent = self.token.line, self.token.value, self.token.column
         elements = {Token.PORTS: self.ports_stmt,
                     Token.BUILD: self.build_stmt,
@@ -114,7 +106,6 @@ class Parser:
         #     self.error("Epsilon not allowed")
 
     def ports_stmt(self):
-        print("ports token: " + self.token.type + " " + self.token.value)
         if self.token.type == Token.PORTS:
             self.take_token(Token.PORTS)
             self.take_token(Token.ASSIGN)
@@ -124,7 +115,6 @@ class Parser:
             self.error("Epsilon not allowed")
 
     def list(self):
-        print("list token: " + self.token.type + " " + self.token.value)
         if self.token.type == Token.ITEM:
             self.take_token(Token.ITEM)
             self.value()
@@ -133,7 +123,6 @@ class Parser:
             pass
 
     def value(self):
-        print("value token: "+self.token.type+" "+self.token.value)
 
         if self.token.type == Token.NUMBER:
             self.take_token(Token.NUMBER)
@@ -144,7 +133,6 @@ class Parser:
         else:
             self.error("Epsilon not allowed")
 
-        print("val line: " + str(self.token.line) + " column: " + str(self.token.column))
 
     def build_stmt(self):
         if self.token.type == Token.BUILD:
@@ -156,12 +144,10 @@ class Parser:
             pass
 
     def image_stmt(self):
-        print("image")
         if self.token.type == Token.IMAGE:
             self.take_token(Token.IMAGE)
             self.take_token(Token.ASSIGN)
             self.take_token(Token.ID)
-            print("end image  token: "+self.token.type+" "+self.token.value)
             print("IMAGE OK")
         else:
             pass
@@ -176,20 +162,14 @@ class Parser:
             pass
 
     def dict(self):
-        print("dict token: "+self.token.type+" "+self.token.value)
 
         start, service_name, indent = self.token.line, self.token.value, self.token.column
         if self.token.type == Token.ID:
             self.take_token(Token.ID)
             self.take_token(Token.ASSIGN)
-            print("start: "+str(start)+" indent: "+str(indent))
-            print("line: "+str(self.token.line)+" column: "+str(self.token.column))
             if self.token.line == start:
                 self.value()
 
-            print("after val --> token: "+self.token.type+" "+self.token.value)
-            print("after start: "+str(start)+" indent: "+str(indent))
-            print("after line: "+str(self.token.line)+" column: "+str(self.token.column))
             self.dict()
             if self.token.column == indent:
                 self.dict()
